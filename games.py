@@ -7,7 +7,7 @@ import requests
 
 # if you want to add a date: date = "2025-04-26"  # example custom date
 def get_games(date: str = None):
- """
+    """
     Fetches MLB games for a given date using the MLB Stats API.
     
     Args:
@@ -28,6 +28,6 @@ def get_games(date: str = None):
 
     data = response.json()
     games = data.get('dates', [])[0].get('games', [])
-    
+        
     game_ids = [game.get('gamePk') for game in games]
     return game_ids
