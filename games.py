@@ -15,10 +15,10 @@ def get_games(date: str = None):
     
     Returns:
         list: A list of game IDs.
-    """
+"""
  
-    if date is None:
-        date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+if date is None:
+    date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 
     url = f'https://statsapi.mlb.com/api/v1/schedule?sportId=1&startDate={date}&endDate={date}'
     response = requests.get(url)
