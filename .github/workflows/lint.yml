@@ -2,8 +2,8 @@ name: Lint Python Code
 
 on:
   push:
-    branches:
-      - main # Specify the branches you want to trigger the workflow on (e.g., main)
+  pull_request:
+    
 
 jobs:
   lint:
