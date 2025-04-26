@@ -1,3 +1,6 @@
+"""
+Setup script for the Baseball Stats project.
+"""
 from setuptools import setup, find_packages
 
 setup(
