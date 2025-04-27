@@ -13,7 +13,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.12'  # Change to your Python version
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
@@ -21,19 +21,18 @@ jobs:
           pip install flake8 pytest pytest-cov
 
       - name: Run flake8
-        run: flake8 --max-line-length=120 -v . > lint_results.txt  2>&1 || (cat lint_results.txt && exit 1)
+        run: flake8 --max-line-length=120 . > lint_results.txt
 
       - name: Send linting results to Datadog
+        if: always()  # Always run this step
         run: |
           LINT_ERRORS=$(grep -c "E" lint_results.txt || echo 0)  # Default to 0 if grep fails
           LINT_WARNINGS=$(grep -c "W" lint_results.txt || echo 0)
 
-          # Print the data being sent for debugging
           echo "Sending the following data to Datadog API:"
           echo "Errors: $LINT_ERRORS, Warnings: $LINT_WARNINGS"
           
-          # Datadog API request
-          response=$(curl -s -w "%{http_code}" -o response.json -X POST "https://api.us5.datadoghq.com/api/v1/series" \
+          curl -X POST "https://api.us5.datadoghq.com/api/v1/series" \
             -H "Content-Type: application/json" \
             -H "DD-API-KEY: ${{ secrets.DD_API_KEY }}" \
             -H "DD-APPLICATION-KEY: ${{ secrets.DD_APP_KEY }}" \
@@ -52,23 +51,13 @@ jobs:
                   \"tags\": [\"repo:baseball-stats\"]
                 }
               ]
-            }")
-          
-          # Check if the response code is 200 (OK)
-          if [[ "$response" =~ ^2 ]]; then
-            echo "Successfully sent linting data to Datadog."
-          else
-            echo "Failed to send data to Datadog. HTTP response code: $response"
-            cat response.json
-            exit 1
-          fi
+            }" | jq
 
       - name: Validate Datadog API keys
         run: |
+          export DD_API_KEY="${{ secrets.DD_API_KEY }}"
+          export DD_APP_KEY="${{ secrets.DD_APP_KEY }}"
           python data_dog_api_check.py
-        env:
-          DD_API_KEY: ${{ secrets.DD_API_KEY }}
-          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
 
       - name: Upload linting results
         uses: actions/upload-artifact@v4
@@ -80,8 +69,7 @@ jobs:
         run: pytest --maxfail=1
 
       - name: Run Tests with Coverage
-        run: |
-          pytest --cov --cov-branch --cov-report=xml
+        run: pytest --cov --cov-branch --cov-report=xml
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v5
