@@ -6,11 +6,14 @@ import sys
 from packages.stats_packages.utils import get_team_id_by_name
 import statsapi
 
+
 def list_all_teams():
     """Prints all MLB teams with their IDs."""
+
     teams = statsapi.get('teams', {'sportIds': 1})['teams']
     for team in teams:
         print(f"{team['name']} (ID: {team['id']})")
+
 
 def main():
     if len(sys.argv) < 2:
@@ -25,6 +28,7 @@ def main():
         print(f"Team ID for '{team_name}': {team_id}")
     else:
         print(f"No team found matching '{team_name}'.")
+
 
 if __name__ == "__main__":
     main()

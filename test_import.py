@@ -5,8 +5,9 @@ Test script for verifying module imports and functionality in the Baseball Stats
 from packages.stats_packages import games
 from sys import argv
 
-#date = "2025-04-26"  # example custom date
-# If you have a function like this:
+# date = "2025-04-26"  # example custom date
+
+
 if len(argv) > 1:
     game_data = games.get_games(argv[1])
 else:
