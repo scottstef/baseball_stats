@@ -21,7 +21,6 @@ headers = {
 # Try to connect to Datadog API
 try:
     response = requests.get(url, headers=headers)
-    
     if response.status_code == 200:
         print("Successfully connected to Datadog API!")
     else:
