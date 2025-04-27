@@ -4,6 +4,7 @@ Test script for verifying module imports and functionality in the Baseball Stats
 
 from packages.stats_packages import games
 
+
 def test_get_games():
     """Test fetching games using a hardcoded date."""
     test_date = "2024-04-20"  # Pick a known good date with games
