@@ -30,7 +30,7 @@ jobs:
           LINT_ERRORS=$(grep -c "E" lint_results.txt || echo 0)  # Default to 0 if grep fails
           LINT_WARNINGS=$(grep -c "W" lint_results.txt || echo 0)
 
-          curl -X POST "https://api.us5.datadoghq.com/api/v1/series?api_key=${{ secrets.DATADOG_API_KEY }}" \
+          curl -X POST "https://api.us5.datadoghq.com/api/v1/series?api_key=${{ secrets.BASEBALL_LINTING_DATADOG }}" \
           -H "Content-Type: application/json" \
           -d "{
             \"series\": [
