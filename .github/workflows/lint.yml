@@ -24,6 +24,40 @@ jobs:
       - name: Run flake8
         run: flake8 --max-line-length=120 .
 
+      - name: Send linting results to Datadog
+        if: failure()  # Only send to Datadog if linting fails
+        run: |
+          LINT_ERRORS=$(grep -c "E" lint_results.txt)  # Count errors in the lint_results.txt file
+          LINT_WARNINGS=$(grep -c "W" lint_results.txt)  # Count warnings in the lint_results.txt file
+
+          curl -X POST "https://api.datadoghq.com/api/v1/series?api_key=${{ secrets.DATADOG_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "series": [
+              {
+                "metric": "linting.errors",
+                "points": [[ '"$(date +%s)"', '"$LINT_ERRORS"' ]],
+                "type": "gauge",
+                "tags": ["repo:baseball-stats"]
+              },
+              {
+                "metric": "linting.warnings",
+                "points": [[ '"$(date +%s)"', '"$LINT_WARNINGS"' ]],
+                "type": "gauge",
+                "tags": ["repo:baseball-stats"]
+              }
+            ]
+          }'
+
+      - name: Upload linting results
+        uses: actions/upload-artifact@v2
+        with:
+          name: lint-results
+          path: lint-results.txt
+
+      - name: Run pytest
+        run: pytest --maxfail=1
+
       - name: Run Tests with Coverage
         run: 
          pytest --cov --cov-branch --cov-report=xml
