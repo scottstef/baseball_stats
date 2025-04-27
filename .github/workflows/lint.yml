@@ -31,8 +31,11 @@ jobs:
       
       - name: Debug API Keys
         run: |
-          echo "DD-API-KEY: ${{ secrets.BASEBALL_STATS_API:0:4 }}..."  # Print part of the key for confirmation
-          echo "DD-APPLICATION-KEY: ${{ secrets.BASEBALL_LINTING_DATADOG:0:4 }}..."  # Print part of the key for confirmation
+          echo "DD-API-KEY starts with: ${DD_API_KEY:0:4}..."
+          echo "DD-APPLICATION-KEY starts with: ${DD_APP_KEY:0:4}..."
+        env:
+          DD_API_KEY: ${{ secrets.BASEBALL_STATS_API }}
+          DD_APP_KEY: ${{ secrets.BASEBALL_LINTING_DATADOG }}
 
       - name: Send linting results to Datadog
         if: always()  # Always run this step
