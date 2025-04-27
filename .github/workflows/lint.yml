@@ -49,8 +49,8 @@ jobs:
           # Capture the response body and status code
           response=$(curl -s -w "%{http_code}" -o response.json -X POST "https://api.us5.datadoghq.com/api/v1/series" \
             -H "Content-Type: application/json" \
-            -H "DD-API-KEY: ${{ secrets.DD_API_KEY }}" \
-            -H "DD-APPLICATION-KEY: ${{ secrets.DD_APP_KEY }}" \
+            -H "DD-API-KEY: ${{ secrets.BASEBALL_STATS_API }}" \
+            -H "DD-APPLICATION-KEY: ${{ secrets.BASEBALL_LINTING_DATADOG }}" \
             -d "{
               \"series\": [
                 {
@@ -83,7 +83,6 @@ jobs:
             echo "Failed to send data to Datadog. HTTP response code: $status_code"
             exit 1
           fi
-
       - name: Upload linting results
         uses: actions/upload-artifact@v4
         with:
