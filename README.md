@@ -34,7 +34,7 @@ python get_boxscores.py
 pytest --cov --cov-branch --cov-report=xml
 ```
 
-![Codecov](https://codecov.io/gh/scottstef/baseball_stats/branch/main/graph/badge.svg)
+[![codecov](https://codecov.io/gh/scottstef/baseball_stats/graph/badge.svg?token=LWZGBGCQHQ)](https://codecov.io/gh/scottstef/baseball_stats)
 
 
 
