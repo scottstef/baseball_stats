@@ -15,4 +15,3 @@ def get_games(date: str = None):
     games = data.get('dates', [])[0].get('games', []) 
     game_ids = [game.get('gamePk') for game in games]
     return game_ids
-

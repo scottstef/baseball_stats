@@ -14,4 +14,3 @@ for game in games:
     except Exception as e:
         print(f'Error fetching highlights for game {game}: {e}')
         print('******************************************************************************')
-
