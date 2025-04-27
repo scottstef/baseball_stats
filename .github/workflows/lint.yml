@@ -23,6 +23,12 @@ jobs:
       - name: Run flake8
         run: flake8 --max-line-length=120 . > lint_results.txt
 
+      - name: Validate Datadog API keys
+        run: |
+          export DD_API_KEY="${{ secrets.BASEBALL_STATS_API }}"
+          export DD_APP_KEY="${{ secrets.BASEBALL_LINTING_DATADOG }}"
+          python data_dog_api_check.py
+      
       - name: Send linting results to Datadog
         if: always()  # Always run this step
         run: |
@@ -69,12 +75,6 @@ jobs:
             echo "Failed to send data to Datadog. HTTP response code: $status_code"
             exit 1
           fi
-
-      - name: Validate Datadog API keys
-        run: |
-          export DD_API_KEY="${{ secrets.BASEBALL_STATS_API }}"
-          export DD_APP_KEY="${{ secrets.BASEBALL_LINTING_DATADOG }}"
-          python data_dog_api_check.py
 
       - name: Upload linting results
         uses: actions/upload-artifact@v4
