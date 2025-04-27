@@ -5,6 +5,7 @@ Test script for verifying module imports and functionality in the Baseball Stats
 from packages.stats_packages import games
 import sys
 
+
 def test_get_games():
     """Test fetching games with or without a date."""
     if len(sys.argv) > 1:
