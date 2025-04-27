@@ -1,14 +1,8 @@
 name: Lint and Test Coverage
-
 on:
   push:
-    branches:
-      - main
-      - get_team_num
-      - linting_workflow
+
   pull_request:
-    branches:
-      - main
 
 jobs:
   lint:
@@ -32,55 +26,11 @@ jobs:
 
       - name: Run Tests with Coverage
         run: |
-<<<<<<< HEAD
-=======
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statisticssstefanoski@yoda:~/repos/baseball_stats$ git switch -
-Switched to branch 'new_branch'
-Your branch is up to date with 'origin/new_branch'.
-sstefanoski@yoda:~/repos/baseball_stats$ cat .github/workflows/lint.yml 
-name: Lint and Test Coverage
-
-on:
-  push:
-    branches:
-      - main
-      - get_team_num
-      - linting_workflow
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.12'  # Change to your Python version
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install flake8 pytest pytest-cov
-
-      - name: Run flake8
-        run: flake8 --max-line-length=120 .
-
-      - name: Run Tests with Coverage
-        run: |
->>>>>>> 20301d4 (added codecov)
          pytest --cov --cov-branch --cov-report=xml
         
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
         with:
-<<<<<<< HEAD
+
           token: ${{ secrets.CODECOV_TOKEN }}  # Set this up in GitHub secrets
           slug: scottstef/baseball_stats
-=======
-          token: ${{ secrets.CODECOV_TOKEN }}  # Set this up in GitHub secrets
->>>>>>> 20301d4 (added codecov)
