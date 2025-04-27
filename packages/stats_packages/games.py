@@ -11,7 +11,7 @@ def get_games(date: str = None):
 
     if response.status_code != 200:
         raise Exception(f"Failed to fetch games: {response.status_code}")
-        data = response.json()
+    data = response.json()
     games = data.get('dates', [])[0].get('games', [])
     game_ids = [game.get('gamePk') for game in games]
     return game_ids
