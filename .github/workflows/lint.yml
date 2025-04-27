@@ -1,7 +1,6 @@
 name: Lint and Test Coverage
 on:
   push:
-
   pull_request:
 
 jobs:
@@ -30,11 +29,16 @@ jobs:
           LINT_ERRORS=$(grep -c "E" lint_results.txt || echo 0)  # Default to 0 if grep fails
           LINT_WARNINGS=$(grep -c "W" lint_results.txt || echo 0)
 
-          curl -X POST "https://api.us5.datadoghq.com/api/v1/series" \
-          -H "Content-Type: application/json" \
-          -H "DD-API-KEY: ${{ secrets.BASSEBALL_STATS_API }}" \
-          -H "DD-APPLICATION-KEY: ${{ secrets.BASEBALL_LINTING_DATADOG }}" \
-          -d "{
+          # Print the data being sent for debugging
+          echo "Sending the following data to Datadog API:"
+          echo "Errors: $LINT_ERRORS, Warnings: $LINT_WARNINGS"
+
+          # Datadog API request
+          response=$(curl -s -w "%{http_code}" -o response.json -X POST "https://api.us5.datadoghq.com/api/v1/series" \
+            -H "Content-Type: application/json" \
+            -H "DD-API-KEY: ${{ secrets.BASSEBALL_STATS_API }}" \
+            -H "DD-APPLICATION-KEY: ${{ secrets.BASEBALL_LINTING_DATADOG }}" \
+            -d "{
               \"series\": [
                 {
                   \"metric\": \"linting.errors\",
@@ -49,31 +53,39 @@ jobs:
                   \"tags\": [\"repo:baseball-stats\"]
                 }
               ]
-          }" | jq
+            }")
+
+          # Check if the response code is 200 (OK)
+          if [[ "$response" =~ ^2 ]]; then
+            echo "Successfully sent linting data to Datadog."
+          else
+            echo "Failed to send data to Datadog. HTTP response code: $response"
+            cat response.json
+            exit 1
+          fi
 
       - name: Validate Datadog API keys
         run: |
-          export DD_API_KEY="${{ secrets.DD_API_KEY }}"
-          export DD_APP_KEY="${{ secrets.DD_APP_KEY }}"
           python data_dog_api_check.py
-      
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+
       - name: Upload linting results
         uses: actions/upload-artifact@v4
         with:
           name: lint_results
           path: lint_results.txt
 
-
       - name: Run pytest
         run: pytest --maxfail=1
 
       - name: Run Tests with Coverage
-        run: 
-         pytest --cov --cov-branch --cov-report=xml
-        
+        run: |
+          pytest --cov --cov-branch --cov-report=xml
+
       - name: Upload coverage report
         uses: codecov/codecov-action@v5
         with:
-
           token: ${{ secrets.CODECOV_TOKEN }}  # Set this up in GitHub secrets
           slug: scottstef/baseball_stats
