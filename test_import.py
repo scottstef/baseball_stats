@@ -3,15 +3,11 @@ Test script for verifying module imports and functionality in the Baseball Stats
 """
 
 from packages.stats_packages import games
-import sys
-
 
 def test_get_games():
-    """Test fetching games with or without a date."""
-    if len(sys.argv) > 1:
-        game_data = games.get_games(sys.argv[1])
-    else:
-        game_data = games.get_games()
+    """Test fetching games using a hardcoded date."""
+    test_date = "2024-04-20"  # Pick a known good date with games
+    game_data = games.get_games(test_date)
 
-    # Basic check: we should get a list or data back
+    # Basic check: we should get a list or dict back
     assert isinstance(game_data, (list, dict))
