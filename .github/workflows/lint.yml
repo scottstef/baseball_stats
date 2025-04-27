@@ -24,7 +24,6 @@ jobs:
         run: flake8 --max-line-length=120 -v . > lint_results.txt  2>&1 || (cat lint_results.txt && exit 1)
 
       - name: Send linting results to Datadog
-        if: always()  # <-- Important: Always run, even if flake8 failed
         run: |
           LINT_ERRORS=$(grep -c "E" lint_results.txt || echo 0)  # Default to 0 if grep fails
           LINT_WARNINGS=$(grep -c "W" lint_results.txt || echo 0)
@@ -32,12 +31,12 @@ jobs:
           # Print the data being sent for debugging
           echo "Sending the following data to Datadog API:"
           echo "Errors: $LINT_ERRORS, Warnings: $LINT_WARNINGS"
-
+          
           # Datadog API request
           response=$(curl -s -w "%{http_code}" -o response.json -X POST "https://api.us5.datadoghq.com/api/v1/series" \
             -H "Content-Type: application/json" \
-            -H "DD-API-KEY: ${{ secrets.BASSEBALL_STATS_API }}" \
-            -H "DD-APPLICATION-KEY: ${{ secrets.BASEBALL_LINTING_DATADOG }}" \
+            -H "DD-API-KEY: ${{ secrets.DD_API_KEY }}" \
+            -H "DD-APPLICATION-KEY: ${{ secrets.DD_APP_KEY }}" \
             -d "{
               \"series\": [
                 {
@@ -54,7 +53,7 @@ jobs:
                 }
               ]
             }")
-
+          
           # Check if the response code is 200 (OK)
           if [[ "$response" =~ ^2 ]]; then
             echo "Successfully sent linting data to Datadog."
