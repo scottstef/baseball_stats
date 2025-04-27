@@ -21,7 +21,7 @@ jobs:
           pip install flake8 pytest pytest-cov
 
       - name: Run flake8
-        run: flake8 --max-line-length=120 . > lint_results.txt  2>&1 || (cat lint_results.txt && exit 1)
+        run: flake8 --max-line-length=120 -v . > lint_results.txt  2>&1 || (cat lint_results.txt && exit 1)
 
       - name: Send linting results to Datadog
         if: always()  # <-- Important: Always run, even if flake8 failed
