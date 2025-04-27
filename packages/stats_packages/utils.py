@@ -1,6 +1,7 @@
 import statsapi
 from datetime import datetime
 
+
 def get_team_id_by_name(team_name: str):
     """Return the MLB team ID matching a partial or full team name."""
     teams = statsapi.get('teams', {'sportIds': 1})['teams']
@@ -9,6 +10,7 @@ def get_team_id_by_name(team_name: str):
         if team_name in team['name'].lower():
             return team['id']
     return None
+
 
 def get_game_ids_for_team(team_name="Orioles", game_date=None, last_game=False):
     """
@@ -20,7 +22,8 @@ def get_game_ids_for_team(team_name="Orioles", game_date=None, last_game=False):
         last_game (bool): Optional. If True, fetches the last game played by the team.
 
     Returns:
-        list: A list of game IDs for the team for the specified date or the last game, or an empty list if no games are found.
+        list: A list of game IDs for the team for the specified date or the last game, 
+        or an empty list if no games are found.
     """
     # Get the team ID using the provided team name (default to 'Orioles')
     team_id = get_team_id_by_name(team_name)

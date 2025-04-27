@@ -1,6 +1,6 @@
-#from utils import get_game_ids_for_team
 from packages.stats_packages.utils import get_game_ids_for_team
 import statsapi
+
 
 # Function to get condensed game highlights for a specific game
 def get_condensed_game(game_id):
@@ -31,6 +31,7 @@ def get_condensed_game(game_id):
                 return
 
     print(f"No Condensed Game found for Game {game_id}")
+
 
 # Main function to check Orioles games
 if __name__ == "__main__":
