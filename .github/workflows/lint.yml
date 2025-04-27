@@ -32,24 +32,24 @@ jobs:
 
           curl -X POST "https://api.us5.datadoghq.com/api/v1/series" \
           -H "Content-Type: application/json" \
-           -H "DD-API-KEY: ${{ secrets.BASSEBALL_STATS_API }}" \
+          -H "DD-API-KEY: ${{ secrets.BASSEBALL_STATS_API }}" \
           -H "DD-APPLICATION-KEY: ${{ secrets.BASEBALL_LINTING_DATADOG }}" \
           -d "{
-            \"series\": [
-              {
-                \"metric\": \"linting.errors\",
-                \"points\": [[ $(date +%s), $LINT_ERRORS ]],
-                \"type\": \"gauge\",
-                \"tags\": [\"repo:baseball-stats\"]
-              },
-              {
-                \"metric\": \"linting.warnings\",
-                \"points\": [[ $(date +%s), $LINT_WARNINGS ]],
-                \"type\": \"gauge\",
-                \"tags\": [\"repo:baseball-stats\"]
-              }
-            ]
-          }"
+              \"series\": [
+                {
+                  \"metric\": \"linting.errors\",
+                  \"points\": [[ $(date +%s), $LINT_ERRORS ]],
+                  \"type\": \"gauge\",
+                  \"tags\": [\"repo:baseball-stats\"]
+                },
+                {
+                  \"metric\": \"linting.warnings\",
+                  \"points\": [[ $(date +%s), $LINT_WARNINGS ]],
+                  \"type\": \"gauge\",
+                  \"tags\": [\"repo:baseball-stats\"]
+                }
+              ]
+          }" | jq
 
       - name: Validate Datadog API keys
         run: |
