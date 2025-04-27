@@ -22,7 +22,7 @@ def get_game_ids_for_team(team_name="Orioles", game_date=None, last_game=False):
         last_game (bool): Optional. If True, fetches the last game played by the team.
 
     Returns:
-        list: A list of game IDs for the team for the specified date or the last game, 
+        list: A list of game IDs for the team for the specified date or the last game,
         or an empty list if no games are found.
     """
     # Get the team ID using the provided team name (default to 'Orioles')
