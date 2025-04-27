@@ -1,7 +1,6 @@
 name: Lint and Test Coverage
 on:
   push:
-
   pull_request:
 
 jobs:
@@ -14,7 +13,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.12'  # Change to your Python version
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
@@ -22,15 +21,82 @@ jobs:
           pip install flake8 pytest pytest-cov
 
       - name: Run flake8
-        run: flake8 --max-line-length=120 .
+        run: flake8 --max-line-length=120 . > lint_results.txt
+
+      - name: Validate Datadog API keys
+        run: |
+          export DD_API_KEY="${{ secrets.BASEBALL_STATS_API }}"
+          export DD_APP_KEY="${{ secrets.BASEBALL_LINTING_DATADOG }}"
+          python data_dog_api_check.py
+      
+      - name: Debug API Keys
+        run: |
+          echo "DD-API-KEY starts with: ${DD_API_KEY:0:4}..."
+          echo "DD-APPLICATION-KEY starts with: ${DD_APP_KEY:0:4}..."
+        env:
+          DD_API_KEY: ${{ secrets.BASEBALL_STATS_API }}
+          DD_APP_KEY: ${{ secrets.BASEBALL_LINTING_DATADOG }}
+
+      - name: Send linting results to Datadog
+        if: always()  # Always run this step
+        run: |
+          LINT_ERRORS=$(grep -c "E" lint_results.txt || echo 0)  # Default to 0 if grep fails
+          LINT_WARNINGS=$(grep -c "W" lint_results.txt || echo 0)
+
+          echo "Sending the following data to Datadog API:"
+          echo "Errors: $LINT_ERRORS, Warnings: $LINT_WARNINGS"
+          
+          # Capture the response body and status code
+          response=$(curl -s -w "%{http_code}" -o response.json -X POST "https://api.us5.datadoghq.com/api/v1/series" \
+            -H "Content-Type: application/json" \
+            -H "DD-API-KEY: ${{ secrets.BASEBALL_STATS_API }}" \
+            -H "DD-APPLICATION-KEY: ${{ secrets.BASEBALL_LINTING_DATADOG }}" \
+            -d "{
+              \"series\": [
+                {
+                  \"metric\": \"linting.errors\",
+                  \"points\": [[ $(date +%s), $LINT_ERRORS ]],
+                  \"type\": \"gauge\",
+                  \"tags\": [\"repo:baseball-stats\"]
+                },
+                {
+                  \"metric\": \"linting.warnings\",
+                  \"points\": [[ $(date +%s), $LINT_WARNINGS ]],
+                  \"type\": \"gauge\",
+                  \"tags\": [\"repo:baseball-stats\"]
+                }
+              ]
+            }")
+
+          # Extract the HTTP status code
+          status_code="${response: -3}"
+          
+          # Debugging: print the response body and HTTP status code
+          echo "HTTP Status Code: $status_code"
+          echo "Response Body:"
+          cat response.json
+
+          # Check if the response code is 200 (OK)
+          if [[ "$status_code" =~ ^2 ]]; then
+            echo "Successfully sent linting data to Datadog."
+          else
+            echo "Failed to send data to Datadog. HTTP response code: $status_code"
+            exit 1
+          fi
+      - name: Upload linting results
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint_results
+          path: lint_results.txt
+
+      - name: Run pytest
+        run: pytest --maxfail=1
 
       - name: Run Tests with Coverage
-        run: 
-         pytest --cov --cov-branch --cov-report=xml
-        
-      - name: Upload coverage report
-        uses: codecov/codecov-action@v2
-        with:
+        run: pytest --cov --cov-branch --cov-report=xml
 
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v5
+        with:
           token: ${{ secrets.CODECOV_TOKEN }}  # Set this up in GitHub secrets
           slug: scottstef/baseball_stats
