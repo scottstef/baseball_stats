@@ -9,4 +9,3 @@ def get_team_id_by_name(team_name: str):
         if team_name in team['name'].lower():
             return team['id']
     return None
-
