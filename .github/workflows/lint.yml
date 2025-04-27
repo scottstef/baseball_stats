@@ -29,6 +29,11 @@ jobs:
           export DD_APP_KEY="${{ secrets.BASEBALL_LINTING_DATADOG }}"
           python data_dog_api_check.py
       
+      - name: Debug API Keys
+        run: |
+          echo "DD-API-KEY: ${{ secrets.BASEBALL_STATS_API:0:4 }}..."  # Print part of the key for confirmation
+          echo "DD-APPLICATION-KEY: ${{ secrets.BASEBALL_LINTING_DATADOG:0:4 }}..."  # Print part of the key for confirmation
+
       - name: Send linting results to Datadog
         if: always()  # Always run this step
         run: |
